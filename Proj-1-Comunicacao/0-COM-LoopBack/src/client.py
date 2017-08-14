@@ -54,10 +54,6 @@ def main():
     txSize = com.tx.getStatus()
     print ("Transmitido       {} bytes ".format(txSize))
 
-
-    # log
-    print ("Lido              {} bytes ".format(nRx))
-
     # Fecha arquivo de imagem
     f.close()
 
