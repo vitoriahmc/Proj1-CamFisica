@@ -14,7 +14,7 @@ from enlace import *
 
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM6"                  # Windows(variacao de)
+serialName = "COM3"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -31,6 +31,11 @@ def main():
     print("Comunicação inicializada")
     print("  porta : {}".format(com.fisica.name))
     print("-------------------------")
+    
+    txLen = 88896
+# Atualiza dados da transmissão
+    txSize = com.tx.getStatus()
+    print ("Transmitido       {} bytes ".format(txSize))
 
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")

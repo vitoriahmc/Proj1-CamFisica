@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #####################################################
 # Camada Física da Computação
-# Prof. Rafael Corsi
+# Sabrina e Vitoria
 #  Abril/2017
 #  Client
 ####################################################
@@ -16,7 +16,7 @@ from enlace import *
 
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM6"                  # Windows(variacao de)
+serialName = "COM7"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -26,7 +26,7 @@ def main():
     com.enable()
 
     # Endereco da imagem a ser transmitida
-    imageR = "./imgs/imageC.png"
+    imageR = "./imgs/imageD.png"
 
     # Log
     print("-------------------------")
@@ -54,8 +54,6 @@ def main():
     txSize = com.tx.getStatus()
     print ("Transmitido       {} bytes ".format(txSize))
 
-    # Fecha arquivo de imagem
-    f.close()
 
     # Encerra comunicação
     print("-------------------------")
