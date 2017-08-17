@@ -42,6 +42,7 @@ def main():
     txLen    = len(txBuffer)
     print(txLen)
 
+    inicial = time.time()
     # Transmite imagem
     print("Transmitindo .... {} bytes".format(txLen))
     com.sendData(txBuffer)
@@ -49,7 +50,8 @@ def main():
     # espera o fim da transmissão
     while(com.tx.getIsBussy()):
         pass
-
+    
+    final = time.time()
     # Atualiza dados da transmissão
     txSize = com.tx.getStatus()
     print ("Transmitido       {} bytes ".format(txSize))
@@ -59,6 +61,8 @@ def main():
     print("-------------------------")
     print("Comunicação encerrada")
     print("-------------------------")
+    print("Tempo de transmissão")
+    print(final-inicial)
     com.disable()
 
 if __name__ == "__main__":
