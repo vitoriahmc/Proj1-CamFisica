@@ -3,11 +3,11 @@
 
 ## Proj 1 Sabrina e Vitoria
 
--Diagrama de Funcionamento e Camadas estão como imagens
--Video mostrando funcionamento do sistema
--Codigo de server e de client separados
+- Diagrama de Funcionamento e Camadas estão como imagens
+- Video mostrando funcionamento do sistema
+- Codigo de server e de client separados
 
-##Elementos da Matéria
+## Elementos da Matéria
 
 - Professor : Rafael Corsi
 - Auxiliar de ensino : Eng. Eduardo Marossi 
