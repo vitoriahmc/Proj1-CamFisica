@@ -33,14 +33,12 @@ def main():
     print("-------------------------")
     
     txLen = 88896
-# Atualiza dados da transmissão
-    txSize = com.tx.getStatus()
-    print ("Transmitido       {} bytes ".format(txSize))
 
+    inicial = time.time()
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
     rxBuffer, nRx = com.getData(txLen)
-
+    final = time.time()
     # log
     print ("Lido              {} bytes ".format(nRx))
 
@@ -58,6 +56,8 @@ def main():
     print("-------------------------")
     print("Comunicação encerrada")
     print("-------------------------")
+    print("Tempo de Recebimento")
+    print(final-inicial)
     com.disable()
 
 if __name__ == "__main__":
