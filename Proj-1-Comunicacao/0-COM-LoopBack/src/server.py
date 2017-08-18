@@ -32,15 +32,13 @@ def main():
     print("  porta : {}".format(com.fisica.name))
     print("-------------------------")
     
-    txLen = 88896
 
     inicial = time.time()
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
-    rxBuffer, nRx = com.getData(txLen)
+    rxBuffer = com.getData()
     final = time.time()
-    # log
-    print ("Lido              {} bytes ".format(nRx))
+
 
     # Salva imagem recebida em arquivo
     print("-------------------------")
