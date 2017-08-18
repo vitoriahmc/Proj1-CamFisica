@@ -36,7 +36,7 @@ def main():
     inicial = time.time()
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
-    rxBuffer = com.getData()
+    rxBuffer = getData()
     final = time.time()
 
 

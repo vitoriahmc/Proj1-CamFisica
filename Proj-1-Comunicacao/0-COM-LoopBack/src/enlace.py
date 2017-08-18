@@ -31,7 +31,12 @@ class enlace(object):
         self.rx          = RX(self.fisica)
         self.tx          = TX(self.fisica)
         self.connected   = False
-
+        self.headSTART   = 0xFF 
+        self.headStruct = Struct("start" / Int8ub,
+                        "size"  / Int16ub )
+        self.eopConstant = 0xFF
+        self.eopStruct = Struct("Constant" / Int8ub)                      
+                        
     def enable(self):
         """ Enable reception and transmission
         """
@@ -50,14 +55,34 @@ class enlace(object):
     ################################
     # Application  interface       #
     ################################
-    def sendData(self, data):
-        """ Send data over the enlace interface
-        """
-        self.tx.sendBuffer(data)
 
+    
+    def buildHead(self, dataLen):
+        head = headStruct.build(dict(
+                                    start = self.headSTART,
+                                    size  = dataLen))
+        return(head)
+    
+    def buildEop(self):
+        eop = eopStruct.build(dict(constante = self.eopConstant))
+        
+        return(eop)
+    
+    def buildPacket(self, data):
+        packet = self.buildHead(len(data))
+        #print(packet)
+        packet += data
+        #print(packet)
+        packet += buildEop()
+        #print(packet)
+        return (packet)
+
+    def sendData(self, data):
+       self.tx.sendBuffer(buildPacket(data))
+       #print(self.buildPacket(data))
+       
     def getData(self, size):
-        """ Get n data over the enlace interface
-        Return the byte array and the size of the buffer
-        """
         data = self.rx.getNData(size)
         return(data, len(data))
+
+
