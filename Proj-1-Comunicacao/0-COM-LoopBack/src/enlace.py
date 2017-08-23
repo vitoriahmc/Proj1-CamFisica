@@ -84,7 +84,7 @@ class enlace(object):
        #print(self.buildPacket(data))
        
     def getData(self, size):
-        data = self.rx.getNData(size)
+        data = self.rx.getPacket()[0]
         return(data, len(data))
 
 

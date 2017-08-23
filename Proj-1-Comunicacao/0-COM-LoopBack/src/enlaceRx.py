@@ -98,10 +98,19 @@ class RX(object):
 
         This function blocks until the number of bytes is received
         """
+        
         while(self.getBufferLen() < size):
             time.sleep(0.05)
 
         return(self.getBuffer(size))
+        
+    def getPacket(self):
+        #eop = 'fe' #definido
+        p = self.getNData(3)
+        a = p[1:2]
+        tamanho = int(str(a),16)
+        pacote = self.getNData(tamanho+4)
+        return(pacote, tamanho)
 
 
     def clearBuffer(self):
