@@ -107,8 +107,10 @@ class RX(object):
     def getPacket(self):
         #eop = 'fe' #definido
         p = self.getNData(3)
-        a = p[1:2]
-        tamanho = int(str(a),16)
+        a = p[1:3]
+        a = str(a)
+        tamanho = int(a[4:6],16) + int(a[8:10])
+        print("SABRINAAAA/", tamanho)
         pacote = self.getNData(tamanho+4)
         return(pacote, tamanho)
 

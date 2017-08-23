@@ -83,8 +83,8 @@ class enlace(object):
         self.tx.sendBuffer(self.buildPacket(data))
        #print(self.buildPacket(data))
        
-    def getData(self, size):
+    def getData(self):
         data = self.rx.getPacket()[0]
-        return(data, len(data))
+        return(data)
 
 
