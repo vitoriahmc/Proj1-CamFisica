@@ -39,7 +39,7 @@ def main():
     print (" - {}".format(imageR))
     print("-------------------------")
     txBuffer = open(imageR, 'rb').read()
-    txLen    = len(txBuffer) + 4
+    txLen    = len(txBuffer)
     print(txLen)
     ######r = '\x0f'.encode()
 
