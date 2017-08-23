@@ -26,7 +26,7 @@ def main():
     com.enable()
 
     # Endereco da imagem a ser transmitida
-    imageR = "./imgs/imageD.png"
+    imageR = "./imgs/imageC.png"
 
     # Log
     print("-------------------------")
@@ -39,8 +39,9 @@ def main():
     print (" - {}".format(imageR))
     print("-------------------------")
     txBuffer = open(imageR, 'rb').read()
-    txLen    = len(txBuffer)
+    txLen    = len(txBuffer) + 4
     print(txLen)
+    ######r = '\x0f'.encode()
 
     inicial = time.time()
     # Transmite imagem

@@ -34,8 +34,8 @@ class enlace(object):
         self.headSTART   = 0xFF 
         self.headStruct = Struct("start" / Int8ub,
                         "size"  / Int16ub )
-        self.eopConstant = 0xFF
-        self.eopStruct = Struct("Constant" / Int8ub)                      
+        self.eopConstant = 0xFE
+        self.eopStruct = Struct("constant" / Int8ub)                      
                         
     def enable(self):
         """ Enable reception and transmission
@@ -58,13 +58,13 @@ class enlace(object):
 
     
     def buildHead(self, dataLen):
-        head = headStruct.build(dict(
+        head = self.headStruct.build(dict(
                                     start = self.headSTART,
                                     size  = dataLen))
         return(head)
     
     def buildEop(self):
-        eop = eopStruct.build(dict(constante = self.eopConstant))
+        eop = self.eopStruct.build(dict(constant = self.eopConstant))
         
         return(eop)
     
@@ -73,12 +73,14 @@ class enlace(object):
         #print(packet)
         packet += data
         #print(packet)
-        packet += buildEop()
+        packet += self.buildEop()
         #print(packet)
         return (packet)
 
+
     def sendData(self, data):
-       self.tx.sendBuffer(buildPacket(data))
+        #buildPacket()
+        self.tx.sendBuffer(self.buildPacket(data))
        #print(self.buildPacket(data))
        
     def getData(self, size):
