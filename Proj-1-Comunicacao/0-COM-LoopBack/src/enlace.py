@@ -34,8 +34,8 @@ class enlace(object):
         self.headSTART   = 0xFF 
         self.headStruct = Struct("start" / Int8ub,
                         "size"  / Int16ub )
-        self.eopConstant = 0xFE
-        self.eopStruct = Struct("constant" / Int8ub)                      
+        self.eopConstant = 0xABCDEF12
+        self.eopStruct = Struct("constant" / Int64ub)                      
                         
     def enable(self):
         """ Enable reception and transmission
@@ -76,18 +76,42 @@ class enlace(object):
         packet += self.buildEop()
         #print(packet)
         return (packet)
+        
+    def unpackage (self, packet):
+    
+        head = packet[0:3]
+        print(len(head))
 
+        payload = packet[len(head):]
+        print(len(payload))
+
+        return payload
 
     def sendData(self, data):
-        #buildPacket()
-        self.tx.sendBuffer(self.buildPacket(data))
-       #print(self.buildPacket(data))
-       
+        """ Send data over the enlace interface
+        """
+        packet = buildPacket(data)
+
+        self.tx.sendBuffer(packet)
+
     def getData(self):
-        data = self.rx.getPacket()[0]
-        return(data)
+        """ Get n data over the enlace interface
+        Return the byte array and the size of the buffer
+        """
+        package = self.rx.getPacket()
+        data = unpackage(package)
+        return(data, len(data))
 
-
-    def getSize(self):
-        t = self.rx.getPacket()[1]
-        return(t)
+#    def sendData(self, data):
+#        #buildPacket()
+#        self.tx.sendBuffer(self.buildPacket(data))
+#       #print(self.buildPacket(data))
+#       
+#    def getData(self):
+#        data = self.rx.getPacket()[0]
+#        return(data)
+#
+#
+#    def getSize(self):
+#        t = self.rx.getPacket()[1]
+#        return(t)

@@ -27,7 +27,8 @@ class RX(object):
         self.threadStop  = False
         self.threadMutex = True
         self.READLEN     = 1024
-
+        self.found       = False
+        
     def thread(self):
         """ RX thread, to send data in parallel with the code
         """
@@ -99,24 +100,33 @@ class RX(object):
         This function blocks until the number of bytes is received
         """
         
-        while(self.getBufferLen() < size):
-            print('OI JEANNNNNN\n')            
-            print(' ')            
+        while(self.getBufferLen() < size):         
             print(self.getBufferLen())
             time.sleep(0.05)
 
         return(self.getBuffer(size))
         
     def getPacket(self):
-        #eop = 'fe' #definido
-        p = self.getNData(3)
-        a = p[1:3]
-        a = str(a)
-        print('SABRINAAAAAAAA', a)
-        tamanho = int(((a[4:6])+ (a[8:10])),16)        
-        print('SABRINAAAAAAAA22222222', tamanho)
-        pacote = self.getNData(tamanho+1)
-        return(pacote, tamanho)
+        eop = b'\xab\xcd\xef\x12'
+
+        while(self.found == False):
+            busca = self.buffer.find(eop)
+            if(busca != -1):
+                print(busca)
+                self.found = True
+                return self.buffer[:busca]
+            else:
+                self.found = False
+                continue
+        
+#    def getPacket(self):
+#        #eop = 'fe' #definido
+#        p = self.getNData(3)
+#        a = p[1:3]
+#        a = str(a)
+#        tamanho = int(((a[4:6])+ (a[8:10])),16)        
+#        pacote = self.getNData(tamanho+1)
+#        return(pacote, tamanho)
 
 
     def clearBuffer(self):
