@@ -20,12 +20,10 @@ class Pacote (object):
 
     def buildHead(self, dataLen):
         head = self.headStruct.build(dict(start = self.headSTART,size  = dataLen))
-        print("HEAD",head)                 
         return(head)
 
     def buildEOP (self):
         eop = self.eopStruct.build(dict(start = self.eopSTART))
-        print("EOP",eop)
         return eop
 
     def buildPacket(self):
@@ -37,7 +35,10 @@ class Pacote (object):
 
 def unbuildPacket(package):
     head = package[0:3]
-    #eop = package[-6:]
     data = package[3:-2]
-    print("HEAD", head)
     return (head,data)
+
+def OverHead(self):
+    overhead = len(self.buildPacket())/len(self.data)
+    return (overhead/100, "%")
+    
