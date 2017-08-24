@@ -100,6 +100,9 @@ class RX(object):
         """
         
         while(self.getBufferLen() < size):
+            print('OI JEANNNNNN\n')            
+            print(' ')            
+            print(self.getBufferLen())
             time.sleep(0.05)
 
         return(self.getBuffer(size))
@@ -109,8 +112,10 @@ class RX(object):
         p = self.getNData(3)
         a = p[1:3]
         a = str(a)
-        tamanho = int((str(a[4:6])[0])+(str(a[4:6])[1]),16) + int((str(a[8:10])[0])+(str(a[8:10])[1]),16)
-        pacote = self.getNData(tamanho+4)
+        print('SABRINAAAAAAAA', a)
+        tamanho = int(((a[4:6])+ (a[8:10])),16)        
+        print('SABRINAAAAAAAA22222222', tamanho)
+        pacote = self.getNData(tamanho+1)
         return(pacote, tamanho)
 
 
