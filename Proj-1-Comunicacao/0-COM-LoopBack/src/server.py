@@ -6,7 +6,7 @@ Created on Mon Aug 14 07:52:22 2017
 """
 
 from enlace import *
-from enlaceRx import *
+from enlaceRx import RX
 #import time
 
 # Serial Com Port
@@ -15,7 +15,7 @@ from enlaceRx import *
 
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM3"                  # Windows(variacao de)
+serialName = "COM4"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -39,7 +39,7 @@ def main():
     print ("Recebendo dados .... ")
     rxBuffer = com.getData()
     final = time.time()
-    rxBuffer = rxBuffer[3:(enlaceRx.getPacket()[1])]
+    rxBuffer = rxBuffer[3:com.getSize()]
     
 
     # Salva imagem recebida em arquivo

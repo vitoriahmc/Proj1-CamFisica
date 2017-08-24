@@ -109,8 +109,7 @@ class RX(object):
         p = self.getNData(3)
         a = p[1:3]
         a = str(a)
-        tamanho = int(a[4:6],16) + int(a[8:10])
-        print("SABRINAAAA/", tamanho)
+        tamanho = int((str(a[4:6])[0])+(str(a[4:6])[1]),16) + int((str(a[8:10])[0])+(str(a[8:10])[1]),16)
         pacote = self.getNData(tamanho+4)
         return(pacote, tamanho)
 

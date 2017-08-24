@@ -88,3 +88,6 @@ class enlace(object):
         return(data)
 
 
+    def getSize(self):
+        t = self.rx.getPacket()[1]
+        return(t)
