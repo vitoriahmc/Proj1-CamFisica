@@ -6,6 +6,7 @@ Created on Mon Aug 14 07:52:22 2017
 """
 
 from enlace import *
+from enlaceRx import RX
 #import time
 
 # Serial Com Port
@@ -36,8 +37,10 @@ def main():
     inicial = time.time()
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
-    rxBuffer, nrX = com.getData()
-    final = time.time()    
+    rxBuffer = com.getData()
+    final = time.time()
+    rxBuffer = rxBuffer[3:com.getSize()]
+    
 
     # Salva imagem recebida em arquivo
     print("-------------------------")

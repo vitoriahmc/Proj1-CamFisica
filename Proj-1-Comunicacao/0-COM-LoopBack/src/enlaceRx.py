@@ -13,7 +13,6 @@ import time
 # Threads
 import threading
 
-import packet
 # Class
 class RX(object):
     """ This class implements methods to handle the reception
@@ -106,17 +105,14 @@ class RX(object):
         return(self.getBuffer(size))
         
     def getPacket(self):
-        pacote = packet.Pacote()
-        eop = pacote.buildEOP()
+        #eop = 'fe' #definido
+        p = self.getNData(3)
+        a = p[1:3]
+        a = str(a)
+        tamanho = int((str(a[4:6])[0])+(str(a[4:6])[1]),16) + int((str(a[8:10])[0])+(str(a[8:10])[1]),16)
+        pacote = self.getNData(tamanho+4)
+        return(pacote, tamanho)
 
-        while(self.end == False):
-            final = self.buffer.find(eop)
-            if(final != -1):
-                self.end = True
-                return self.buffer[:final]
-            else:
-                self.end = False
-                continue
 
     def clearBuffer(self):
         """ Clear the reception buffer

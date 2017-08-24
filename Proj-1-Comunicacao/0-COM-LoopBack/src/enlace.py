@@ -19,7 +19,6 @@ from interfaceFisica import fisica
 # enlace Tx e Rx
 from enlaceRx import RX
 from enlaceTx import TX
-import packet
 
 class enlace(object):
     """ This class implements methods to the interface between Enlace and Application
@@ -31,7 +30,12 @@ class enlace(object):
         self.fisica      = fisica(name)
         self.rx          = RX(self.fisica)
         self.tx          = TX(self.fisica)
-        self.connected   = False              
+        self.connected   = False
+        self.headSTART   = 0xFF 
+        self.headStruct = Struct("start" / Int8ub,
+                        "size"  / Int16ub )
+        self.eopConstant = 0xFE
+        self.eopStruct = Struct("constant" / Int8ub)                      
                         
     def enable(self):
         """ Enable reception and transmission
@@ -52,13 +56,38 @@ class enlace(object):
     # Application  interface       #
     ################################
 
+    
+    def buildHead(self, dataLen):
+        head = self.headStruct.build(dict(
+                                    start = self.headSTART,
+                                    size  = dataLen))
+        return(head)
+    
+    def buildEop(self):
+        eop = self.eopStruct.build(dict(constant = self.eopConstant))
+        
+        return(eop)
+    
+    def buildPacket(self, data):
+        packet = self.buildHead(len(data))
+        #print(packet)
+        packet += data
+        #print(packet)
+        packet += self.buildEop()
+        #print(packet)
+        return (packet)
+
+
     def sendData(self, data):
-        pacote = packet.Pacote()
-        novoPacote = pacote.buildPacket(data)
-        self.tx.sendBuffer(novoPacote)
+        #buildPacket()
+        self.tx.sendBuffer(self.buildPacket(data))
+       #print(self.buildPacket(data))
        
     def getData(self):
-        package = self.rx.getPacket()
-        pacote = packet.Pacote()
-        data = pacote.unbuildPacket(package)
-        return(data, len(data))
+        data = self.rx.getPacket()[0]
+        return(data)
+
+
+    def getSize(self):
+        t = self.rx.getPacket()[1]
+        return(t)
