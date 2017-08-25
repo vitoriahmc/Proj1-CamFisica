@@ -15,7 +15,7 @@ from enlaceRx import RX
 
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM6"                  # Windows(variacao de)
+serialName = "COM4"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -25,7 +25,7 @@ def main():
     com.enable()
 
     # Endereco da imagem a ser salva
-    imageW = "./imgs/recebida.png" and "./imgs/recebida2.png"
+    imageW = "./imgs/recebida.png" 
 
     # Log
     print("-------------------------")
@@ -36,6 +36,24 @@ def main():
     while(com.tx.getIsBussy()):
         pass
 
+    waitingHandshake = True
+    while waitingHandshake:
+        print('waiting Handshake')
+        time.sleep(0.1)
+        print(com.getCmd())
+        if com.getCmd() == b'\xaa':
+            com.sendSyn()
+            time.sleep(0.1)
+            com.sendAck()
+            time.sleep(0.1)
+            if com.getCmd() == b'\x0f':
+                waitingHandshake = False
+            else:
+                com.sendnAck()
+        else:
+            com.sendnAck()
+        
+        
     inicial = time.time()
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
