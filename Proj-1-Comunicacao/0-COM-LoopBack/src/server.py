@@ -15,7 +15,7 @@ from enlaceRx import RX
 
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM4"                  # Windows(variacao de)
+serialName = "COM6"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -25,7 +25,7 @@ def main():
     com.enable()
 
     # Endereco da imagem a ser salva
-    imageW = "./imgs/recebida.png"
+    imageW = "./imgs/recebida.png" and "./imgs/recebida2.png"
 
     # Log
     print("-------------------------")

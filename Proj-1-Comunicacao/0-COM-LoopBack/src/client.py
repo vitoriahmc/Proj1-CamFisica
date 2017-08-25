@@ -43,6 +43,13 @@ def main():
     print(txLen)
     ######r = '\x0f'.encode()
 
+    waitingHandshake = True
+    while waitingHandshake:
+        print('waiting Handshake')
+        waitingHandshake = com.getSyn()
+        time.sleep(0.1)
+
+
     inicial = time.time()
     # Transmite imagem
     print("Transmitindo .... {} bytes".format(txLen))

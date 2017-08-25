@@ -24,7 +24,7 @@ class enlace(object):
     """ This class implements methods to the interface between Enlace and Application
     """
 
-    def __init__(self, name):
+     def __init__(self, name):
         """ Initializes the enlace class
         """
         self.fisica      = fisica(name)
@@ -32,10 +32,16 @@ class enlace(object):
         self.tx          = TX(self.fisica)
         self.connected   = False
         self.headSTART   = 0xFF 
+        self.Syn         = 0xAA
+        self.Ack         = 0x0F
+        self.nAck        = 0xF0
+        self.Data        = 0x24
+        self.sizeCmd     = 0x00 + 0x00
         self.headStruct = Struct("start" / Int8ub,
-                        "size"  / Int16ub )
+                        "size"  / Int16ub, 
+                        "tipo" / Int8ub)
         self.eopConstant = 0xABCDEF12
-        self.eopStruct = Struct("constant" / Int64ub)                      
+        self.eopStruct = Struct("constant" / Int64ub)                     
                         
     def enable(self):
         """ Enable reception and transmission
@@ -107,3 +113,41 @@ class enlace(object):
 #    def getData(self):
 #        data = self.rx.getPacket()[0]
 #        return(data)
+
+     def buildHeadData(self, dataLen):
+        head = self.headStruct.build(dict(
+                                    start = self.headSTART,
+                                    tipo = self.Data,
+                                    size  = dataLen))
+        return(head)
+        
+    def buildHeadCmd(self, subtype):
+        head = self.headStruct.build(dict(
+                                    start = self.headSTART,
+                                    size = self.sizeCmd,
+                                    tipo = self.Syn if subtype == 0 else (self.Ack if subtype == 1 else self.nAck) 
+                                    ))
+        return(head+self.buildEop())
+    
+       
+    def sendSyn(self):
+        #buildPacket()
+        self.tx.sendBuffer(self.buildSynPacket())
+        
+    def sendAck(self):
+        #buildPacket()
+        self.tx.sendBuffer(self.buildAckPacket())
+        
+    def sendnAck(self):
+        #buildPacket()
+        self.tx.sendBuffer(self.buildnAckPacket())
+        
+        
+    def buildSynPacket(self):
+        return(self.buildHeadCmd(0))
+        
+    def buildAckPacket(self):
+        return(self.buildHeadCmd(1))
+    
+    def buildnAckPacket(self):
+        return(self.buildHeadCmd(2))
