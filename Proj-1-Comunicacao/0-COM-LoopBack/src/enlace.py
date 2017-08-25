@@ -24,7 +24,7 @@ class enlace(object):
     """ This class implements methods to the interface between Enlace and Application
     """
 
-     def __init__(self, name):
+    def __init__(self, name):
         """ Initializes the enlace class
         """
         self.fisica      = fisica(name)
@@ -41,7 +41,7 @@ class enlace(object):
                         "size"  / Int16ub, 
                         "tipo" / Int8ub)
         self.eopConstant = 0xABCDEF12
-        self.eopStruct = Struct("constant" / Int64ub)                     
+        self.eopStruct = Struct("constant" / Int32ub)                     
                         
     def enable(self):
         """ Enable reception and transmission
@@ -114,7 +114,7 @@ class enlace(object):
 #        data = self.rx.getPacket()[0]
 #        return(data)
 
-     def buildHeadData(self, dataLen):
+    def buildHeadData(self, dataLen):
         head = self.headStruct.build(dict(
                                     start = self.headSTART,
                                     tipo = self.Data,
@@ -141,6 +141,11 @@ class enlace(object):
     def sendnAck(self):
         #buildPacket()
         self.tx.sendBuffer(self.buildnAckPacket())
+        
+    def getCmd(self):
+        tipo = self.rx.getPacket()
+        print(tipo[3:])
+        return(tipo[2:])
         
         
     def buildSynPacket(self):
