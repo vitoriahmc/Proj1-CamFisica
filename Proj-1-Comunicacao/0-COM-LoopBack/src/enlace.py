@@ -90,7 +90,7 @@ class enlace(object):
     def sendData(self, data):
         """ Send data over the enlace interface
         """
-        packet = buildPacket(data)
+        packet = self.buildPacket(data)
 
         self.tx.sendBuffer(packet)
 
@@ -99,7 +99,7 @@ class enlace(object):
         Return the byte array and the size of the buffer
         """
         package = self.rx.getPacket()
-        data = unpackage(package)
+        data = self.unpackage(package)
         return(data, len(data))
 
 #    def sendData(self, data):

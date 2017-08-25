@@ -15,7 +15,7 @@ from enlaceRx import RX
 
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM3"                  # Windows(variacao de)
+serialName = "COM4"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -33,14 +33,16 @@ def main():
     print("  porta : {}".format(com.fisica.name))
     print("-------------------------")
     
+    while(com.tx.getIsBussy()):
+        pass
 
     inicial = time.time()
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
     rxBuffer, nRx = com.getData()
 #    rxBuffer = com.getData()
-#    final = time.time()
-#    rxBuffer = rxBuffer[0:-1]
+    final = time.time()
+    rxBuffer = rxBuffer[0:-1]
 
     # Salva imagem recebida em arquivo
     print("-------------------------")

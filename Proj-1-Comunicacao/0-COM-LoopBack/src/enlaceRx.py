@@ -107,14 +107,14 @@ class RX(object):
         return(self.getBuffer(size))
         
     def getPacket(self):
-        eop = b'\xab\xcd\xef\x12'
-
+    
         while(self.found == False):
-            busca = self.buffer.find(eop)
+            busca = self.buffer.find(b'\xab\xcd\xef\x12')
             if(busca != -1):
                 print(busca)
                 self.found = True
                 return self.buffer[:busca]
+                
             else:
                 self.found = False
                 continue
