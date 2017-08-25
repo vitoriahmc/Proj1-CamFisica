@@ -27,7 +27,7 @@ class RX(object):
         self.threadStop  = False
         self.threadMutex = True
         self.READLEN     = 1024
-        self.found       = False
+        self.end       = False
         
     def thread(self):
         """ RX thread, to send data in parallel with the code
@@ -108,15 +108,15 @@ class RX(object):
         
     def getPacket(self):
     
-        while(self.found == False):
-            busca = self.buffer.find(b'\xab\xcd\xef\x12')
-            if(busca != -1):
-                print(busca)
-                self.found = True
-                return self.buffer[:busca]
+        while(self.end == False):
+            find = self.buffer.find(b'\xab\xcd\xef\x12')
+            if(find != -1):
+                print(find)
+                self.end = True
+                return self.buffer[:find]
                 
             else:
-                self.found = False
+                self.end = False
                 continue
         
 #    def getPacket(self):

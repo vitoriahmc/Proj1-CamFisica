@@ -40,9 +40,7 @@ def main():
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
     rxBuffer, nRx = com.getData()
-#    rxBuffer = com.getData()
     final = time.time()
-    rxBuffer = rxBuffer[0:-1]
 
     # Salva imagem recebida em arquivo
     print("-------------------------")

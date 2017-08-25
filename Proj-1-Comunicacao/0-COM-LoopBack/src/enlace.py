@@ -70,14 +70,11 @@ class enlace(object):
     
     def buildPacket(self, data):
         packet = self.buildHead(len(data))
-        #print(packet)
         packet += data
-        #print(packet)
         packet += self.buildEop()
-        #print(packet)
         return (packet)
         
-    def unpackage (self, packet):
+    def unpack (self, packet):
     
         head = packet[0:3]
         print(len(head))
@@ -99,7 +96,7 @@ class enlace(object):
         Return the byte array and the size of the buffer
         """
         package = self.rx.getPacket()
-        data = self.unpackage(package)
+        data = self.unpack(package)
         return(data, len(data))
 
 #    def sendData(self, data):
@@ -110,8 +107,3 @@ class enlace(object):
 #    def getData(self):
 #        data = self.rx.getPacket()[0]
 #        return(data)
-#
-#
-#    def getSize(self):
-#        t = self.rx.getPacket()[1]
-#        return(t)
