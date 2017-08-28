@@ -16,7 +16,7 @@ from enlace import *
 
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM6"                  # Windows(variacao de)
+serialName = "COM8"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -43,21 +43,28 @@ def main():
     print(txLen)
     ######r = '\x0f'.encode()
 
+#    waitingHandshake = True
+#    while waitingHandshake:
+#        print('waiting Handshake')
+#        com.sendSyn()
+#        time.sleep(0.1)
+#        print(com.getCmd())
+#        if com.getCmd() == b'\xaa': #tem que receber o AA e o 0F
+#            time.sleep(0.15)
+#            if com.getCmd() == b'\x0f':
+#                waitingHandshake = False
+#                com.sendAck()
+#            else:
+#                com.sendnAck()
+#        else:
+#             com.sendnAck()
+             
     waitingHandshake = True
     while waitingHandshake:
         print('waiting Handshake')
         com.sendSyn()
         time.sleep(0.1)
         print(com.getCmd())
-        if com.getCmd() == b'\xaa': #tem que receber o AA e o 0F
-            time.sleep(0.15)
-            if com.getCmd() == b'\x0f':
-                waitingHandshake = False
-                com.sendAck()
-            else:
-                com.sendnAck()
-        else:
-             com.sendnAck()
 
 
     inicial = time.time()

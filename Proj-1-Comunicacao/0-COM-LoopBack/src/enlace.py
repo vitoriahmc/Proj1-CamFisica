@@ -39,9 +39,11 @@ class enlace(object):
         self.sizeCmd     = 0x00 + 0x00
         self.headStruct = Struct("start" / Int8ub,
                         "size"  / Int16ub, 
-                        "tipo" / Int8ub)
+                        "tipo" / Int8ub,
+                             )
         self.eopConstant = 0xABCDEF12
-        self.eopStruct = Struct("constant" / Int32ub)                     
+        self.eopStruct = Struct("constant" / Int32ub)   
+        self.HeadLen = self.headStruct.sizeof()                  
                         
     def enable(self):
         """ Enable reception and transmission
@@ -132,27 +134,33 @@ class enlace(object):
        
     def sendSyn(self):
         #buildPacket()
-        self.tx.sendBuffer(self.buildSynPacket())
+        self.tx.sendBuffer(self.buildHeadCmd(0))
         
     def sendAck(self):
         #buildPacket()
-        self.tx.sendBuffer(self.buildAckPacket())
+        self.tx.sendBuffer(self.buildHeadCmd(1))
         
     def sendnAck(self):
         #buildPacket()
-        self.tx.sendBuffer(self.buildnAckPacket())
+        self.tx.sendBuffer(self.buildHeadCmd(2))
         
     def getCmd(self):
-        tipo = self.rx.getPacket()
-        print(tipo[3:])
-        return(tipo[2:])
+        head = self.rx.getPacket()[0:HeadLen]
+        headStructNew = self.headStruct.parse(head)
+        return(headStructNew.tipo)
+        #Essa função acha o tipo, no momento nao importa se é data ou comando
+                 
+     #    def sendCmd(self, commandAck, commandnAck, commandSyn):
+     #        commandAck = self.buildAckPacket
+     #        commandnAck = self.buildnAckPacket
+     #        commandSyn = self.buildSynPacket
+     #        
+     #        if self.buildHeadCmd(0):
+     #            self.tx.sendBuffer(commandSyn)
+     #            
+     #        elif self.buildHeadCmd(1):
+   #            self.tx.sendBuffer(commandAck)
+     #            
+     #        else:
+     #            self.tx.sendBuffer(commandnAck) 
         
-        
-    def buildSynPacket(self):
-        return(self.buildHeadCmd(0))
-        
-    def buildAckPacket(self):
-        return(self.buildHeadCmd(1))
-    
-    def buildnAckPacket(self):
-        return(self.buildHeadCmd(2))
