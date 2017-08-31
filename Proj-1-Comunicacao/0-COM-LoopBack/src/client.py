@@ -2,21 +2,20 @@
 # -*- coding: utf-8 -*-
 #####################################################
 # Camada Física da Computação
-# Sabrina e Vitoria
+# Prof. Rafael Corsi
 #  Abril/2017
-#  Client
+#  Aplicação
 ####################################################
 
 from enlace import *
-#import time
+import time
 
 # Serial Com Port
 #   para saber a sua porta, execute no terminal :
 #   python -m serial.tools.list_ports
 
-#serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM8"                  # Windows(variacao de)
+serialName = "COM6"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -36,58 +35,32 @@ def main():
 
     # Carrega imagem
     print ("Carregando imagem para transmissão :")
-    print (" - {}".format(imageR))
+    #print (" - {}".format(imageR))
     print("-------------------------")
     txBuffer = open(imageR, 'rb').read()
     txLen    = len(txBuffer)
     print(txLen)
-    ######r = '\x0f'.encode()
-
-#    waitingHandshake = True
-#    while waitingHandshake:
-#        print('waiting Handshake')
-#        com.sendSyn()
-#        time.sleep(0.1)
-#        print(com.getCmd())
-#        if com.getCmd() == b'\xaa': #tem que receber o AA e o 0F
-#            time.sleep(0.15)
-#            if com.getCmd() == b'\x0f':
-#                waitingHandshake = False
-#                com.sendAck()
-#            else:
-#                com.sendnAck()
-#        else:
-#             com.sendnAck()
-             
-    waitingHandshake = True
-    while waitingHandshake:
-        print('waiting Handshake')
-        com.sendSyn()
-        time.sleep(0.1)
-        print(com.getCmd())
-
-
-    inicial = time.time()
+    
     # Transmite imagem
     print("Transmitindo .... {} bytes".format(txLen))
+    inicio = time.time()
+    com.Handshake()
+    time.sleep(0.1)
     com.sendData(txBuffer)
 
     # espera o fim da transmissão
     while(com.tx.getIsBussy()):
         pass
-    
-    final = time.time()
-    # Atualiza dados da transmissão
-    txSize = com.tx.getStatus()
-    print ("Transmitido       {} bytes ".format(txSize))
+    tempo = time.time()-inicio
 
+    # Atualiza dados da transmissão
+    print ("Transmitido       {} bytes ".format(txLen))
+    print ("Tempo de envio: ", tempo," s")
 
     # Encerra comunicação
     print("-------------------------")
     print("Comunicação encerrada")
     print("-------------------------")
-    print("Tempo de transmissão")
-    print(final-inicial)
     com.disable()
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ class RX(object):
         self.threadMutex = True
         self.READLEN     = 1024
         self.end       = False
-        
+
     def thread(self):
         """ RX thread, to send data in parallel with the code
         """
@@ -37,7 +37,6 @@ class RX(object):
                 rxTemp, nRx = self.fisica.read(self.READLEN)
                 if (nRx > 0):
                     self.buffer += rxTemp
-                print(self.buffer)
                 time.sleep(0.001)
 
     def threadStart(self):
@@ -99,39 +98,36 @@ class RX(object):
 
         This function blocks until the number of bytes is received
         """
-        
-        while(self.getBufferLen() < size):         
-            print(self.getBufferLen())
+        while(self.getBufferLen() < size):
             time.sleep(0.05)
 
         return(self.getBuffer(size))
-        
-    def getPacket(self):
-    
-        while(self.end == False):
-            find = self.buffer.find(b'\xab\xcd\xef\x12')
-            if(find != -1):
-                print(find)
-                self.end = True
-                return self.buffer[:find]
-                
-            else:
-                self.end = False
-                continue
-        
-#    def getPacket(self):
-#        #eop = 'fe' #definido
-#        p = self.getNData(3)
-#        a = p[1:3]
-#        a = str(a)
-#        tamanho = int(((a[4:6])+ (a[8:10])),16)        
-#        pacote = self.getNData(tamanho+1)
-#        return(pacote, tamanho)
 
 
     def clearBuffer(self):
         """ Clear the reception buffer
         """
         self.buffer = b""
-
-
+                
+    def getPacket(self, timeout):
+        inicio = time.time()
+        self.end= False
+        while(self.end == False and (time.time()-inicio < timeout)):
+            
+            #print(len(self.buffer))
+            eop = self.buffer.find(b'\xab\xbc\xcd\xde\xef\xfa')
+            if (eop != -1):
+                self.end = True
+                tmp= self.buffer[:eop]
+                self.clearBuffer()
+                return tmp
+            time.sleep(0.1)
+        self.clearBuffer()
+        return bytes(bytearray())
+        
+#    def validate(self, buffer):
+#        eop = buffer.find(b'\xab\xbc\xcd\xde\xef\xfa')
+#        if eop != -1:
+#            return True
+#        else:
+#            return False

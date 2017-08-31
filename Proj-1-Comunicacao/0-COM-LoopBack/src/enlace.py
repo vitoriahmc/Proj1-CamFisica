@@ -20,6 +20,8 @@ from interfaceFisica import fisica
 from enlaceRx import RX
 from enlaceTx import TX
 
+import packet
+
 class enlace(object):
     """ This class implements methods to the interface between Enlace and Application
     """
@@ -31,20 +33,14 @@ class enlace(object):
         self.rx          = RX(self.fisica)
         self.tx          = TX(self.fisica)
         self.connected   = False
-        self.headSTART   = 0xFF 
-        self.Syn         = 0xAA
-        self.Ack         = 0x0F
-        self.nAck        = 0xF0
-        self.Data        = 0x24
-        self.sizeCmd     = 0x00 + 0x00
-        self.headStruct = Struct("start" / Int8ub,
-                        "size"  / Int16ub, 
-                        "tipo" / Int8ub,
-                             )
-        self.eopConstant = 0xABCDEF12
-        self.eopStruct = Struct("constant" / Int32ub)   
-        self.HeadLen = self.headStruct.sizeof()                  
-                        
+
+        construtor = packet.packet()
+        
+        nada = bytearray([])
+        self.SYN = construtor.buildPacket(0, nada, 0)
+        self.ACK = construtor.buildPacket(0, nada, 1)
+        self.nACK = construtor.buildPacket(0, nada, 2)
+
     def enable(self):
         """ Enable reception and transmission
         """
@@ -64,103 +60,99 @@ class enlace(object):
     # Application  interface       #
     ################################
 
-    
-    def buildHead(self, dataLen):
-        head = self.headStruct.build(dict(
-                                    start = self.headSTART,
-                                    size  = dataLen))
-        return(head)
-    
-    def buildEop(self):
-        eop = self.eopStruct.build(dict(constant = self.eopConstant))
+    def Handshake(self):#client
         
-        return(eop)
+        print("Estabelecendo conexao...")
+        timeout=2.0
+
+        while self.connected == False:
+          time.sleep(0.1)
+          self.sendCmd(0)
+          
+          
+          tempacote= self.getData(timeout)[2]
+          if tempacote == 4:
+              print("Nao recebi o Syn ainda")
+              #time.sleep(0.01)
+              #self.sendCmd(2)
+              #manda o nAck quando chegou algo que nao é um Syn ou quando nao chegou nada
+          if tempacote == 0:
+              print("Recebi o Syn!")
+              tempacote= self.getData(timeout)[2]
+              if tempacote == 4:
+                  print("Recebi o Syn e ainda não recebi o Ack")
+                  time.sleep(0.1)
+                  self.sendCmd(2) #manda o nAck enquanto o Ack nao chega
+              if tempacote == 1:
+                  print("Recebi o Ack")
+                  self.sendCmd(1)
+                  print("Mandei o ultimo Ack")
+                  self.connected = True
+          
+        print("Conectado com sucesso!")
+
+    def waitingHandshake(self): #SERVER
+        timeout= 2.0
+        while True:    
     
-    def buildPacket(self, data):
-        packet = self.buildHead(len(data))
-        packet += data
-        packet += self.buildEop()
-        return (packet)
+            print("Esperando o Syn...")
+            while(self.getData(timeout)[2] != 0):
+                print("...")
+                continue
+            print("Recebi o Syn")
+            time.sleep(0.1)
+            self.sendCmd(0)
+            print("enviei o Syn")
+            time.sleep(0.1)
+            self.sendCmd(1)
+            print("enviei o Ack")
+            
+            print("Aguardando o Ack")
+            tempacote= self.getData(timeout)[2]
+            print("tempacote: "+str(tempacote))
+            if tempacote == 4:
+                print("Não recebi nada (timeout)")
+            if tempacote == 2:
+                print("Recebi nAck")
+            if tempacote == 1:
+                print("Recebi o ultimo Ack")
+                print("Handshake ENCERRADO")
+                break
+        print("----")
         
-    def unpack (self, packet):
-    
-        head = packet[0:3]
-        print(len(head))
-
-        payload = packet[len(head):]
-        print(len(payload))
-
-        return payload
-
     def sendData(self, data):
         """ Send data over the enlace interface
         """
-        packet = self.buildPacket(data)
+        construtor = packet.packet()
+        pacote = construtor.buildPacket(len(data), data, 3)
+        
+        print("Checagem pacote: "+str(len(pacote)))
+        self.tx.sendBuffer(pacote)
+    
+    def sendCmd(self, tipo):
+        if tipo == 0:
+            self.tx.sendBuffer(self.SYN)
+        if tipo == 1:
+            self.tx.sendBuffer(self.ACK)
+        if tipo == 2:
+            self.tx.sendBuffer(self.nACK)
+    
+    #
 
-        self.tx.sendBuffer(packet)
-
-    def getData(self):
+    def getData(self, timeout):
         """ Get n data over the enlace interface
         Return the byte array and the size of the buffer
         """
-        package = self.rx.getPacket()
-        data = self.unpack(package)
-        return(data, len(data))
 
-#    def sendData(self, data):
-#        #buildPacket()
-#        self.tx.sendBuffer(self.buildPacket(data))
-#       #print(self.buildPacket(data))
-#       
-#    def getData(self):
-#        data = self.rx.getPacket()[0]
-#        return(data)
-
-    def buildHeadData(self, dataLen):
-        head = self.headStruct.build(dict(
-                                    start = self.headSTART,
-                                    tipo = self.Data,
-                                    size  = dataLen))
-        return(head)
+        pacote = self.rx.getPacket(timeout)
+        construtor = packet.packet()
         
-    def buildHeadCmd(self, subtype):
-        head = self.headStruct.build(dict(
-                                    start = self.headSTART,
-                                    size = self.sizeCmd,
-                                    tipo = self.Syn if subtype == 0 else (self.Ack if subtype == 1 else self.nAck) 
-                                    ))
-        return(head+self.buildEop())
-    
+        data, tipo = construtor.unpack(pacote)
        
-    def sendSyn(self):
-        #buildPacket()
-        self.tx.sendBuffer(self.buildHeadCmd(0))
-        
-    def sendAck(self):
-        #buildPacket()
-        self.tx.sendBuffer(self.buildHeadCmd(1))
-        
-    def sendnAck(self):
-        #buildPacket()
-        self.tx.sendBuffer(self.buildHeadCmd(2))
-        
-    def getCmd(self):
-        head = self.rx.getPacket()[0:HeadLen]
-        headStructNew = self.headStruct.parse(head)
-        return(headStructNew.tipo)
-        #Essa função acha o tipo, no momento nao importa se é data ou comando
-                 
-     #    def sendCmd(self, commandAck, commandnAck, commandSyn):
-     #        commandAck = self.buildAckPacket
-     #        commandnAck = self.buildnAckPacket
-     #        commandSyn = self.buildSynPacket
-     #        
-     #        if self.buildHeadCmd(0):
-     #            self.tx.sendBuffer(commandSyn)
-     #            
-     #        elif self.buildHeadCmd(1):
-   #            self.tx.sendBuffer(commandAck)
-     #            
-     #        else:
-     #            self.tx.sendBuffer(commandnAck) 
-        
+        if data != None:
+            return(data, len(data), 3)
+        else:
+            #print("Debug"+str(tipo))
+            return(None, 0, tipo)
+
+
