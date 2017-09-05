@@ -127,7 +127,10 @@ class enlace(object):
         pacote = construtor.buildPacket(len(data), data, 3)
         
         print("Checagem pacote: "+str(len(pacote)))
-        self.tx.sendBuffer(pacote)
+        while self.getData(10)[2] != 1:
+            print("Estou reenviando o pacote pois nao recebi o Ack")
+            self.tx.sendBuffer(pacote)
+        break
     
     def sendCmd(self, tipo):
         if tipo == 0:
@@ -151,8 +154,11 @@ class enlace(object):
        
         if data != None:
             return(data, len(data), 3)
+            self.sendCmd(1)
+            print("mandando Ack do pacote")
         else:
-            #print("Debug"+str(tipo))
+            self.sendCmd(2)
+            print("mandando nAck do pacote")
             return(None, 0, tipo)
 
 
