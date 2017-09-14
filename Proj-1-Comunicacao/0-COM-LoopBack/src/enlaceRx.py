@@ -119,10 +119,10 @@ class RX(object):
             if (eop != -1):
                 self.end = True
                 tmp= self.buffer[:eop]
-                self.clearBuffer()
+              #  self.clearBuffer()
                 return tmp
             time.sleep(0.1)
-        self.clearBuffer()
+        
         return bytes(bytearray())
         
 #    def validate(self, buffer):

@@ -16,6 +16,7 @@ import time
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
 serialName = "COM6"                  # Windows(variacao de)
 
+
 def main():
     # Inicializa enlace
     com = enlace(serialName)

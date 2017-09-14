@@ -22,6 +22,8 @@ from enlaceTx import TX
 
 import packet
 
+import crcmod
+
 class enlace(object):
     """ This class implements methods to the interface between Enlace and Application
     """
@@ -141,7 +143,7 @@ class enlace(object):
                 print("Checagem pacote: "+str(len(pacote)))    
             time.sleep(0.05)
         
-    
+
     def sendCmd(self, tipo):
         if tipo == 0:
             self.tx.sendBuffer(self.SYN)
@@ -248,4 +250,4 @@ class enlace(object):
 #                print("mandando nAck do pacote")
 #                return(None, 0, tipo)
 
-
+ 
