@@ -138,12 +138,18 @@ class enlace(object):
             crc_payload = self.CRC(data_cortada)
             pacote_final = construtor.buildPacket(len(data_cortada), data_cortada, 3, atual, qtdpartes, crc_head, crc_payload)
             self.tx.sendBuffer(pacote_final) #envia pacote verdadeiro
+            time.sleep(0.05)
+            
             if self.getData(10)[2] == 1: #10 é valor do timeout
-                print("Recebi o Ack")
+                print("Recebi o Ack, vou enviar o proximo pacote")
                 atual += 1
                 x += y
                 y += max_pkt
-                print("Checagem pacote: "+str(len(pacote_final)))    
+                print("Checagem pacote: "+str(len(pacote_final)))
+                
+            if self.getData(10)[2] == 2:
+                print("Recebi um nAck, vou reenviar o ultimo pacote")
+                self.tx.sendBuffer(pacote_final)
             time.sleep(0.05)
         
 
@@ -175,11 +181,11 @@ class enlace(object):
                     crc_payload_2 = self.CRC(data)
                     crc_head_2 = self.CRC(pacote[0:5])
                     if crc_payload_2 == crc_payload and crc_head_2 == crc_head:
-                        
+                        #comparação de crcs, se der certo, envia Ack
                         payload += data
                         self.sendCmd(1)
                         print("Recebi o pacote, mandando o Ack")
-                        time.sleep(0.5)
+                        time.sleep(0.05)
                         pacote = self.rx.getPacket(timeout)
                         data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
                     else:
@@ -199,30 +205,30 @@ class enlace(object):
 
         return CRC
 
-    def pegar_CRC(self,data):
-      head = data[0:9]
-      container = packet.headStruct.parse(head)
-      return (container["checksum_head"], container["checksum_payload"])
-      
-    def comparar_CRC(self,data):
-        crc8 = crcmod.predefined.mkCrcFun("crc-8")
-        checksum_head,checksum_payload = self.pegar_CRC(data)
-        semCRC = data[0:5] 
-
-        mydata = self.pacotinho(data)
-
-        if checksum_head == crc8(mydata) and checksum_payload == crc8(semCRC):
-            return True
-        else:
-            return False
-
-
-    def pacotinho(self,data):
-
-        head = data[0:9]
-        #resto =  data[9:-10]
-
-        return(head)
+#    def pegar_CRC(self,data):
+#      head = data[0:9]
+#      container = packet.headStruct.parse(head)
+#      return (container["checksum_head"], container["checksum_payload"])
+#      
+#    def comparar_CRC(self,data):
+#        crc8 = crcmod.predefined.mkCrcFun("crc-8")
+#        checksum_head,checksum_payload = self.pegar_CRC(data)
+#        semCRC = data[0:5] 
+#
+#        mydata = self.pacotinho(data)
+#
+#        if checksum_head == crc8(mydata) and checksum_payload == crc8(semCRC):
+#            return True
+#        else:
+#            return False
+#
+#
+#    def pacotinho(self,data):
+#
+#        head = data[0:9]
+#        #resto =  data[9:-10]
+#
+#        return(head)
 
 #    def sendData2(self, data):
 #        """ Send data over the enlace interface
