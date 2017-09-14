@@ -15,7 +15,7 @@ from construct import *
 
 # Interface Física
 from interfaceFisica import fisica
-
+import math
 # enlace Tx e Rx
 from enlaceRx import RX
 from enlaceTx import TX
@@ -139,14 +139,14 @@ class enlace(object):
             self.tx.sendBuffer(pacote_final) #envia pacote verdadeiro
             time.sleep(0.05)
             
-            if self.getData(10)[2] == 1: #10 é valor do timeout
+            if self.getData(0.05)[2] == 1: #10 é valor do timeout
                 print("Recebi o Ack, vou enviar o proximo pacote")
                 atual += 1
                 x += y
                 y += max_pkt
                 print("Checagem pacote: "+str(len(pacote_final)))
                 
-            if self.getData(10)[2] == 2:
+            if self.getData(0.05)[2] == 2:
                 print("Recebi um nAck, vou reenviar o ultimo pacote")
                 self.tx.sendBuffer(pacote_final)
             time.sleep(0.05)
