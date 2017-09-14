@@ -65,6 +65,7 @@ class packet(object):
                 crc_payload = pacote[7]
             else:
                 tipo = pacote[3]
+                crc_head = pacote
     
             if payload == bytearray([]):
                 payload = None
