@@ -19,20 +19,20 @@ class packet(object):
                                  "tipos" / Int8ub,
                                  "numero"/ Int8ub,
                                  "total"/ Int8ub,
-                                 "CRC_head" / Int8ub,
-                                 "CRC_payload"/ Int8ub)
+                                 "crc_head" / Int8ub,
+                                 "crc_payload"/ Int8ub)
         self.eopConstant =  bytearray([0xAB, 0xBC, 0xCD, 0xDE, 0xEF, 0xFA])
         self.HeadLen = self.headStruct.sizeof() 
 
-    def buildHead(self, dataLen, tipo, nbr, nbr_total, CRC_head, CRC_payload):
+    def buildHead(self, dataLen, tipo, nbr, nbr_total, crc_head, crc_payload):
         head = self.headStruct.build(dict(
                                     start = self.headSTART,
                                     size  = dataLen,
                                     tipos = tipo,
                                     numero = nbr,
                                     total = nbr_total,
-                                    CRC_head = CRC_head,
-                                    CRC_payload = CRC_payload))
+                                    crc_head = crc_head,
+                                    crc_payload = crc_payload))
         return(head)
 
     
