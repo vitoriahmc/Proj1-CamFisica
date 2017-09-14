@@ -14,7 +14,7 @@ import time
 #   para saber a sua porta, execute no terminal :
 #   python -m serial.tools.list_ports
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM7"                  # Windows(variacao de)
+serialName = "COM6"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -47,7 +47,7 @@ def main():
     print("Comunicação COMPLETA")
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
-    rxBuffer, nRx, trash = com.getData(20)
+    rxBuffer, nRx, trash = com.getData(10)
     print("nosso pacote retornou: "+str(trash))
     
 

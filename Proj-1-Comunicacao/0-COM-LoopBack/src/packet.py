@@ -16,21 +16,29 @@ class packet(object):
         self.headSTART = 0xFF
         self.headStruct = Struct("start" / Int8ub, 
                                  "size" / Int16ub, 
-                                 "tipos" / Int8ub)
+                                 "tipos" / Int8ub,
+                                 "numero"/ Int8ub,
+                                 "total"/ Int8ub,
+                                 "CRC_head" / Int8ub,
+                                 "CRC_payload"/ Int8ub)
         self.eopConstant =  bytearray([0xAB, 0xBC, 0xCD, 0xDE, 0xEF, 0xFA])
         self.HeadLen = self.headStruct.sizeof() 
 
-    def buildHead(self, dataLen, tipo):
+    def buildHead(self, dataLen, tipo, nbr, nbr_total, CRC_head, CRC_payload):
         head = self.headStruct.build(dict(
                                     start = self.headSTART,
                                     size  = dataLen,
-                                    tipos = tipo))
+                                    tipos = tipo,
+                                    numero = nbr,
+                                    total = nbr_total,
+                                    CRC_head = CRC_head,
+                                    CRC_payload = CRC_payload))
         return(head)
 
     
-    def buildPacket(self, dataLen, data, tipo):
+    def buildPacket(self, dataLen, data, tipo, nbr, nbr_total):
         
-        packet = self.buildHead(dataLen, tipo)
+        packet = self.buildHead(dataLen, tipo, nbr, nbr_total)
         packet += data
         packet += self.eopConstant
 
@@ -51,13 +59,17 @@ class packet(object):
             if lenght > 0:
                 lenght += self.HeadLen
                 payload = pacote[self.HeadLen:lenght]
+                atual = pacote[4] #valor do pacote atual
+                total = pacote[5] #quantos pacotes vao ter
+                crc_head = pacote[6]
+                crc_payload = pacote[7]
             else:
                 tipo = pacote[3]
     
             if payload == bytearray([]):
                 payload = None
             
-            return payload, tipo
+            return payload, tipo, atual, total, crc_head, crc_payload
         else:
             data = None
             tipo = 4
