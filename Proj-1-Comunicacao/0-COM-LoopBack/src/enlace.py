@@ -22,8 +22,6 @@ from enlaceTx import TX
 
 import packet
 
-import crcmod
-
 class enlace(object):
     """ This class implements methods to the interface between Enlace and Application
     """
@@ -41,9 +39,9 @@ class enlace(object):
         construtor = packet.packet()
         
         nada = bytearray([])
-        self.SYN = construtor.buildPacket(0, nada, 0, nada, nada, nada, nada)
-        self.ACK = construtor.buildPacket(0, nada, 1, nada, nada, nada, nada)
-        self.nACK = construtor.buildPacket(0, nada, 2, nada, nada, nada, nada)
+        self.SYN = construtor.buildPacket(0, nada, 0, 0, 0, 0, 0)
+        self.ACK = construtor.buildPacket(0, nada, 1, 0, 0, 0, 0)
+        self.nACK = construtor.buildPacket(0, nada, 2, 0, 0, 0, 0)
 
     def enable(self):
         """ Enable reception and transmission
@@ -80,6 +78,7 @@ class enlace(object):
           if tempacote == 0:
               print("Recebi o Syn!")
               tempacote= self.getData(timeout)[2]
+              #print(tempacote)
               if tempacote == 4:
                   print("Recebi o Syn e ainda não recebi o Ack")
                   time.sleep(0.1)
@@ -107,7 +106,7 @@ class enlace(object):
             time.sleep(0.1)
             self.sendCmd(1)
             print("enviei o Ack")
-            
+            time.sleep(0.1)
             print("Aguardando o Ack")
             tempacote= self.getData(timeout)[2]
             print("tempacote: "+str(tempacote))
@@ -167,6 +166,7 @@ class enlace(object):
         """ Get n data over the enlace interface
         Return the byte array and the size of the buffer
         """
+        print("Chamei o Get Data")
         payload = bytearray([])
         while True:
             
@@ -174,9 +174,9 @@ class enlace(object):
             construtor = packet.packet()          
             
             data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
-            
+            print("while")
             if data != None:
-               
+                
                 while atual <= total:
                     crc_payload_2 = self.CRC(data)
                     crc_head_2 = self.CRC(pacote[0:5])
@@ -193,10 +193,10 @@ class enlace(object):
                         print("Recebi o pacote corrompido, mandando nAck")
                     
                 return(payload, len(payload), 3)
-                break
+                
             else:
                 return(None, 0, tipo)
-                break
+                
     
     def CRC(self,data):
         crc8 = crcmod.predefined.mkCrcFun("crc-8")

@@ -55,7 +55,11 @@ class packet(object):
             lenght = int(lenght, 2)
     
             tipo = 3
-    
+            atual = 0
+            total = 0
+            crc_head = 0
+            crc_payload = 0
+            
             if lenght > 0:
                 lenght += self.HeadLen
                 payload = pacote[self.HeadLen:lenght]
@@ -65,7 +69,7 @@ class packet(object):
                 crc_payload = pacote[7]
             else:
                 tipo = pacote[3]
-                crc_head = pacote
+                
     
             if payload == bytearray([]):
                 payload = None
@@ -74,6 +78,10 @@ class packet(object):
         else:
             data = None
             tipo = 4
-            return data, tipo
+            atual = 0
+            total = 0
+            crc_head = 0
+            crc_payload = 0
+            return data, tipo, atual, total, crc_head, crc_payload
 
             

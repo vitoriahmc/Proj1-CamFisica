@@ -48,7 +48,7 @@ def main():
     print("Comunicação COMPLETA")
     # Faz a recepção dos dados
     print ("Recebendo dados .... ")
-    rxBuffer, nRx, trash = com.getData(10)
+    rxBuffer, nRx, trash = com.getData(20)
     print("nosso pacote retornou: "+str(trash))
     
 
