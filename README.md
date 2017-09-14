@@ -1,12 +1,6 @@
 ﻿
 # Camada Física da Computação
 
-## Proj 1 Sabrina e Vitoria
-
-- Diagrama de Funcionamento e Camadas estão como imagens
-- Video mostrando funcionamento do sistema (https://youtu.be/180gFHwVKQc)
-- Codigo de server e de client separados
-
 ## Elementos da Matéria
 
 - Professor : Rafael Corsi
