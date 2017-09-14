@@ -41,9 +41,9 @@ class enlace(object):
         construtor = packet.packet()
         
         nada = bytearray([])
-        self.SYN = construtor.buildPacket(0, nada, 0, nada, nada)
-        self.ACK = construtor.buildPacket(0, nada, 1, nada, nada)
-        self.nACK = construtor.buildPacket(0, nada, 2, nada, nada)
+        self.SYN = construtor.buildPacket(0, nada, 0, nada, nada, nada, nada)
+        self.ACK = construtor.buildPacket(0, nada, 1, nada, nada, nada, nada)
+        self.nACK = construtor.buildPacket(0, nada, 2, nada, nada, nada, nada)
 
     def enable(self):
         """ Enable reception and transmission

@@ -36,9 +36,9 @@ class packet(object):
         return(head)
 
     
-    def buildPacket(self, dataLen, data, tipo, nbr, nbr_total):
+    def buildPacket(self, dataLen, data, tipo, nbr, nbr_total, crc_head, crc_payload):
         
-        packet = self.buildHead(dataLen, tipo, nbr, nbr_total)
+        packet = self.buildHead(dataLen, tipo, nbr, nbr_total, crc_head, crc_payload)
         packet += data
         packet += self.eopConstant
 
