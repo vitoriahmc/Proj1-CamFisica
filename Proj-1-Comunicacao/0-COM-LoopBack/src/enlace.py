@@ -9,7 +9,7 @@
 
 # Importa pacote de tempo
 import time
-
+import crcmod
 # Construct Struct
 from construct import *
 
@@ -28,6 +28,8 @@ class enlace(object):
     """ This class implements methods to the interface between Enlace and Application
     """
 
+    max_pkt = 2048
+    
     def __init__(self, name):
         """ Initializes the enlace class
         """
@@ -75,9 +77,6 @@ class enlace(object):
           tempacote= self.getData(timeout)[2]
           if tempacote == 4:
               print("Nao recebi o Syn ainda")
-              #time.sleep(0.01)
-              #self.sendCmd(2)
-              #manda o nAck quando chegou algo que nao é um Syn ou quando nao chegou nada
           if tempacote == 0:
               print("Recebi o Syn!")
               tempacote= self.getData(timeout)[2]
@@ -126,13 +125,25 @@ class enlace(object):
         """ Send data over the enlace interface
         """
         construtor = packet.packet()
-        pacote = construtor.buildPacket(len(data), data, 3)
         
-        print("Checagem pacote: "+str(len(pacote)))
-        while self.getData(20)[2] != 1:
-            print("Estou reenviando o pacote pois nao recebi o Ack")
+        max_pkt = self.max_pkt
+        qtdpartes = math.ceil(len(data)/max_pkt)
+        atual = 1
+        x = 0
+        y = max_pkt + 1
+        while atual <= qtdpartes:
+            data_cortada = data[x:y]
+            pacote = construtor.buildPacket(len(data_cortada), data_cortada, 3)
             self.tx.sendBuffer(pacote)
+            if self.getData(timeout)[2] == 1:
+                print("Recebi o Ack")
+                atual += 1
+                x += y
+                y += max_pkt
+                print("Checagem pacote: "+str(len(pacote)))    
+            time.sleep(0.05)
         
+
     def sendCmd(self, tipo):
         if tipo == 0:
             self.tx.sendBuffer(self.SYN)
@@ -147,25 +158,31 @@ class enlace(object):
         """ Get n data over the enlace interface
         Return the byte array and the size of the buffer
         """
-        tmp = False
-        while tmp == False:
-
-            pacote = self.rx.getPacket(timeout)
-            construtor = packet.packet()
+        payload = bytearray([])
+        while True:
             
-            data, tipo = construtor.unpack(pacote)
-       
+            pacote = self.rx.getPacket(timeout)
+            construtor = packet.packet()          
+            
+            data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
+            
             if data != None:
-                return(data, len(data), 3)
-                self.sendCmd(1)
-                print("mandando Ack do pacote")
-                tmp = True
+               
+                while atual <= total:
+                    
+                    payload += data
+                    self.sendCmd(1)
+                    print("Recebi o pacote, mandando o Ack")
+                    time.sleep(0.5)
+                    pacote = self.rx.getPacket(timeout)
+                    data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
+                    
+                return(payload, len(payload), 3)
+                break
             else:
-                self.sendCmd(2)
-                print("mandando nAck do pacote")
                 return(None, 0, tipo)
-
-
+                break
+    
     def CRC(self,data):
         crc8 = crcmod.predefined.mkCrcFun("crc-8")
 
@@ -197,5 +214,42 @@ class enlace(object):
         #resto =  data[9:-10]
 
         return(head)
+
+#    def sendData2(self, data):
+#        """ Send data over the enlace interface
+#        """
+#        construtor = packet.packet()
+#      
+#        pacote = construtor.buildPacket(len(data), data, 3)
+#        
+#        print("Checagem pacote: "+str(len(pacote)))
+#       
+#        while self.getData2(11)[2] != 1:
+#            print("Estou reenviando o pacote pois nao recebi o Ack")
+#           # self.rx.clearBuffer()
+#            self.tx.sendBuffer(pacote)
+    
+#    def getData2(self, timeout):
+#        """ Get n data over the enlace interface
+#        Return the byte array and the size of the buffer
+#        """
+#        tmp = False
+#        while tmp == False:
+#            pacote = self.rx.getPacket(timeout)
+#            construtor = packet.packet()
+#            
+#            data, tipo = construtor.unpack(pacote)
+#           
+#            if data != None:
+#                return(data, len(data), 3)
+#                time.sleep(0.2)
+#                self.sendCmd(1)
+#                print("mandando Ack do pacote")
+#                tmp = Trues
+#            else:
+#                time.sleep(0.2)
+#                self.sendCmd(2)
+#                print("mandando nAck do pacote")
+#                return(None, 0, tipo)
 
  
