@@ -41,9 +41,9 @@ class enlace(object):
         construtor = packet.packet()
         
         nada = bytearray([])
-        self.SYN = construtor.buildPacket(0, nada, 0)
-        self.ACK = construtor.buildPacket(0, nada, 1)
-        self.nACK = construtor.buildPacket(0, nada, 2)
+        self.SYN = construtor.buildPacket(0, nada, 0, nada, nada)
+        self.ACK = construtor.buildPacket(0, nada, 1, nada, nada)
+        self.nACK = construtor.buildPacket(0, nada, 2, nada, nada)
 
     def enable(self):
         """ Enable reception and transmission
@@ -133,14 +133,17 @@ class enlace(object):
         y = max_pkt + 1
         while atual <= qtdpartes:
             data_cortada = data[x:y]
-            pacote = construtor.buildPacket(len(data_cortada), data_cortada, 3)
-            self.tx.sendBuffer(pacote)
-            if self.getData(timeout)[2] == 1:
+            pacote = construtor.buildPacket(len(data_cortada), data_cortada, 3, atual, qtdpartes, 0, 0) #constroi pacote falso
+            crc_head = self.CRC(pacote[0:5]) #calcula crc pro pacote falso
+            crc_payload = self.CRC(data_cortada)
+            pacote_final = construtor.buildPacket(len(data_cortada), data_cortada, 3, atual, qtdpartes, crc_head, crc_payload)
+            self.tx.sendBuffer(pacote_final) #envia pacote verdadeiro
+            if self.getData(10)[2] == 1: #10 é valor do timeout
                 print("Recebi o Ack")
                 atual += 1
                 x += y
                 y += max_pkt
-                print("Checagem pacote: "+str(len(pacote)))    
+                print("Checagem pacote: "+str(len(pacote_final)))    
             time.sleep(0.05)
         
 
@@ -169,13 +172,19 @@ class enlace(object):
             if data != None:
                
                 while atual <= total:
-                    
-                    payload += data
-                    self.sendCmd(1)
-                    print("Recebi o pacote, mandando o Ack")
-                    time.sleep(0.5)
-                    pacote = self.rx.getPacket(timeout)
-                    data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
+                    crc_payload_2 = self.CRC(data)
+                    crc_head_2 = self.CRC(pacote[0:5])
+                    if crc_payload_2 == crc_payload and crc_head_2 == crc_head:
+                        
+                        payload += data
+                        self.sendCmd(1)
+                        print("Recebi o pacote, mandando o Ack")
+                        time.sleep(0.5)
+                        pacote = self.rx.getPacket(timeout)
+                        data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
+                    else:
+                        self.sendCmd(2)
+                        print("Recebi o pacote corrompido, mandando nAck")
                     
                 return(payload, len(payload), 3)
                 break
