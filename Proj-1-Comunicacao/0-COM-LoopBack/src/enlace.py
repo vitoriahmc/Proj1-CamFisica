@@ -22,6 +22,8 @@ from enlaceTx import TX
 
 import packet
 
+import crcmod
+
 class enlace(object):
     """ This class implements methods to the interface between Enlace and Application
     """
@@ -127,11 +129,10 @@ class enlace(object):
         pacote = construtor.buildPacket(len(data), data, 3)
         
         print("Checagem pacote: "+str(len(pacote)))
-        while self.getData(10)[2] != 1:
+        while self.getData(20)[2] != 1:
             print("Estou reenviando o pacote pois nao recebi o Ack")
             self.tx.sendBuffer(pacote)
-        break
-    
+        
     def sendCmd(self, tipo):
         if tipo == 0:
             self.tx.sendBuffer(self.SYN)
@@ -146,19 +147,55 @@ class enlace(object):
         """ Get n data over the enlace interface
         Return the byte array and the size of the buffer
         """
+        tmp = False
+        while tmp == False:
 
-        pacote = self.rx.getPacket(timeout)
-        construtor = packet.packet()
-        
-        data, tipo = construtor.unpack(pacote)
+            pacote = self.rx.getPacket(timeout)
+            construtor = packet.packet()
+            
+            data, tipo = construtor.unpack(pacote)
        
-        if data != None:
-            return(data, len(data), 3)
-            self.sendCmd(1)
-            print("mandando Ack do pacote")
+            if data != None:
+                return(data, len(data), 3)
+                self.sendCmd(1)
+                print("mandando Ack do pacote")
+                tmp = True
+            else:
+                self.sendCmd(2)
+                print("mandando nAck do pacote")
+                return(None, 0, tipo)
+
+
+    def CRC(self,data):
+        crc8 = crcmod.predefined.mkCrcFun("crc-8")
+
+        CRC = (crc8(data))
+
+        return CRC
+
+    def pegar_CRC(self,data):
+      head = data[0:9]
+      container = packet.headStruct.parse(head)
+      return (container["checksum_head"], container["checksum_payload"])
+      
+    def comparar_CRC(self,data):
+        crc8 = crcmod.predefined.mkCrcFun("crc-8")
+        checksum_head,checksum_payload = self.pegar_CRC(data)
+        semCRC = data[0:5] 
+
+        mydata = self.pacotinho(data)
+
+        if checksum_head == crc8(mydata) and checksum_payload == crc8(semCRC):
+            return True
         else:
-            self.sendCmd(2)
-            print("mandando nAck do pacote")
-            return(None, 0, tipo)
+            return False
 
 
+    def pacotinho(self,data):
+
+        head = data[0:9]
+        #resto =  data[9:-10]
+
+        return(head)
+
+ 
