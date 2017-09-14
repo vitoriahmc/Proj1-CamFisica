@@ -178,8 +178,10 @@ class enlace(object):
                     data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
                     
                 return(payload, len(payload), 3)
+                break
             else:
                 return(None, 0, tipo)
+                break
     
     def CRC(self,data):
         crc8 = crcmod.predefined.mkCrcFun("crc-8")
