@@ -185,12 +185,12 @@ class enlace(object):
                     self.sendCmd(1)
                     print("Recebi o pacote, mandando o Ack")
                 else:
-                    time.sleep(0.05)
+                    time.sleep(0.1)
                     self.sendCmd(2)
                     print("Recebi o pacote corrompido, mandando nAck")
                 last= atual
-                
-                while atual < total:
+                ptotal=total
+                while atual < ptotal:
                     pacote = self.rx.getPacket(timeout)
                     data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
                     
@@ -207,7 +207,7 @@ class enlace(object):
                         #comparação de crcs, se der certo, envia Ack
                         last=atual
                         payload += data
-                        time.sleep(0.05)
+                        time.sleep(0.1)
                         self.sendCmd(1)
                         print("Recebi o pacote, mandando o Ack")
                     elif(last==atual):
