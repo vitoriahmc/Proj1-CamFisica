@@ -129,27 +129,26 @@ class enlace(object):
         qtdpartes = math.ceil(len(data)/max_pkt)
         atual = 1
         x = 0
-        y = max_pkt + 1
+        y = max_pkt
         while atual <= qtdpartes:
             data_cortada = data[x:y]
             pacote = construtor.buildPacket(len(data_cortada), data_cortada, 3, atual, qtdpartes, 0, 0) #constroi pacote falso
             crc_head = self.CRC(pacote[0:5]) #calcula crc pro pacote falso
             crc_payload = self.CRC(data_cortada)
             pacote_final = construtor.buildPacket(len(data_cortada), data_cortada, 3, atual, qtdpartes, crc_head, crc_payload)
-            self.tx.sendBuffer(pacote_final) #envia pacote verdadeiro
-            time.sleep(0.05)
+            time.sleep(0.05)            
+            self.tx.sendBuffer(pacote_final) #envia pacote verdadeiro            
             
-            if self.getData(0.05)[2] == 1: #10 é valor do timeout
+            tmp= self.getData(0.5)
+            if tmp[2] == 1: #10 é valor do timeout
                 print("Recebi o Ack, vou enviar o proximo pacote")
                 atual += 1
-                x += y
+                x += max_pkt
                 y += max_pkt
                 print("Checagem pacote: "+str(len(pacote_final)))
                 
-            if self.getData(0.05)[2] == 2:
+            if tmp[2] == 2:
                 print("Recebi um nAck, vou reenviar o ultimo pacote")
-                self.tx.sendBuffer(pacote_final)
-            time.sleep(0.05)
         
 
     def sendCmd(self, tipo):
@@ -174,22 +173,50 @@ class enlace(object):
             construtor = packet.packet()          
             
             data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
-            print("while")
             if data != None:
+                print("Atual: ", atual)
+                print("Total: ", total)
+                crc_payload_2 = self.CRC(data)
+                crc_head_2 = self.CRC(pacote[0:5])
+                if crc_payload_2 == crc_payload and crc_head_2 == crc_head:
+                    #comparação de crcs, se der certo, envia Ack
+                    payload += data
+                    time.sleep(0.05)
+                    self.sendCmd(1)
+                    print("Recebi o pacote, mandando o Ack")
+                else:
+                    time.sleep(0.05)
+                    self.sendCmd(2)
+                    print("Recebi o pacote corrompido, mandando nAck")
+                last= atual
                 
-                while atual <= total:
+                while atual < total:
+                    pacote = self.rx.getPacket(timeout)
+                    data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
+                    
+                    print("Recebi um pacote tipo: ", tipo)
+                    if (tipo!=3):
+                        continue
+                    
+                    print("Atual: ", atual)
+                    print("Total: ", total)
+                    
                     crc_payload_2 = self.CRC(data)
                     crc_head_2 = self.CRC(pacote[0:5])
-                    if crc_payload_2 == crc_payload and crc_head_2 == crc_head:
+                    if crc_payload_2 == crc_payload and crc_head_2 == crc_head and atual==(last+1):
                         #comparação de crcs, se der certo, envia Ack
+                        last=atual
                         payload += data
+                        time.sleep(0.05)
                         self.sendCmd(1)
                         print("Recebi o pacote, mandando o Ack")
-                        time.sleep(0.05)
-                        pacote = self.rx.getPacket(timeout)
-                        data, tipo, atual, total, crc_head, crc_payload = construtor.unpack(pacote)
+                    elif(last==atual):
+                        print("Recebi um pacote repetido")
                     else:
+                        time.sleep(0.05)
                         self.sendCmd(2)
+                        print("Last: ", last)
+                        print("Atual: ", atual)
                         print("Recebi o pacote corrompido, mandando nAck")
                     
                 return(payload, len(payload), 3)

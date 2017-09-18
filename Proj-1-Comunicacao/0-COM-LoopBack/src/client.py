@@ -15,7 +15,7 @@ import time
 #   python -m serial.tools.list_ports
 
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM7"                  # Windows(variacao de)
+serialName = "COM10"                  # Windows(variacao de)
 
 def main():
     # Inicializa enlace
@@ -25,7 +25,7 @@ def main():
     com.enable()
 
     # Endereco da imagem a ser transmitida
-    imageR = "./imgs/imageC.png"
+    imageR = "./imgs/imageD.png"
 
     # Log
     print("-------------------------")
@@ -44,7 +44,7 @@ def main():
     # Transmite imagem
     print("Transmitindo .... {} bytes".format(txLen))
     inicio = time.time()
-    #com.Handshake()
+    com.Handshake()
     time.sleep(0.1)
     com.sendData(txBuffer)
 

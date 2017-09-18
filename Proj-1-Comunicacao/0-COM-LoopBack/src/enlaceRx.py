@@ -119,7 +119,10 @@ class RX(object):
             if (eop != -1):
                 self.end = True
                 tmp= self.buffer[:eop]
-              #  self.clearBuffer()
+                print("AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+                #self.clearBuffer()
+                self.buffer= self.buffer[eop+6:]
+               
                 return tmp
             time.sleep(0.1)
         
